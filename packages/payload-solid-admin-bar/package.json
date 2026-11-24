@@ -1,6 +1,6 @@
 {
   "name": "@rocksoliddigital/payload-solid-admin-bar",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A WordPress-style admin bar for Payload CMS, the same in the admin and on the website: visit site, edit or view the current document, create new documents, exit preview and log out",
   "keywords": [
     "payload",
