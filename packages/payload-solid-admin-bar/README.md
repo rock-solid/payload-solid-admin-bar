@@ -92,6 +92,51 @@ the site in Payload's `cors` and `csrf`. Custom routes: `admin`, `api`, `account
 and makes no requests, since the admin around it already has one. Pass `showInFrames` to show it
 anyway.
 
+## Multi-tenancy
+
+With Payload's [multi-tenant plugin](https://payloadcms.com/docs/plugins/multi-tenant), the bar
+names the tenant on screen (a location, a brand, a site) and keeps "+ New" in it.
+
+```ts
+// payload.config.ts
+adminBarPlugin<Location>({
+  siteName: 'Example',
+  collections: {
+    // `tenant` is the document's tenant, read once by the bar
+    pages: { path: ({ doc, tenant }) => `/${tenant?.slug}/${doc.slug}` },
+  },
+  tenants: {
+    collection: 'locations', // the plugin's tenantsSlug
+    path: ({ tenant }) => `/${tenant.slug}`, // its home page; leave out for no link
+  },
+});
+```
+
+- **In the admin**, the bar shows the document's tenant on its edit screen, and the tenant
+  selected in the admin elsewhere, linking to its home page. Its name is the tenants collection's
+  `useAsTitle` field, or `tenants.label(tenant)`. Options: `field` (the tenant field, default
+  `tenant`) and `cookie` (the selected tenant's cookie, default `payload-tenant`). `path` can return
+  a full URL when each tenant has its own domain.
+- **On the website**, tell the bar the page's tenant:
+
+  ```tsx
+  <AdminBarDocument
+    collection="pages"
+    id={page.id}
+    tenant={{ id: location.id, label: location.name, href: `/${location.slug}` }}
+  />
+  ```
+
+  The bar shows its name, and "+ New" sets the multi-tenant plugin's cookie to it, so a page
+  created from a location's website starts in that location, whatever was selected in the admin.
+  That needs the CMS on the site's origin; `tenantCookie` names the cookie, or `false` leaves it
+  alone.
+
+- **Tenants on their own domains** with one CMS: the website bar asks the CMS who is logged in from
+  the tenant's domain. Browsers send Payload's login cookie (`SameSite=Lax`) only between sites on
+  the same registrable domain (`cms.example.com` and `harbour.example.com`), so on separate domains
+  the website bar can't see the login and stays hidden. The admin bar works either way.
+
 ## Styling
 
 `styles.css` is imported by the components. Override the custom properties on `.solid-admin-bar`
@@ -100,5 +145,4 @@ markup alone, for stories and custom wrappers.
 
 ## Not yet
 
-- Multi-tenancy beyond `siteURL`: showing the tenant, and a website bar per tenant.
 - Globals (View/Edit for a global).

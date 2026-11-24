@@ -4,7 +4,8 @@ import Link from 'next/link';
 import type React from 'react';
 
 import { SiteAdminBar } from '@/components/SiteAdminBar';
-import { listPublished } from '@/data';
+import { listPublished, listSites, mainSite } from '@/data';
+import { MAIN_SITE, siteHome } from '@/paths';
 import { SITE_NAME } from '@/site';
 
 import './site.css';
@@ -16,7 +17,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode();
-  const pages = await listPublished('pages');
+  const main = await mainSite();
+  const pages = main ? await listPublished('pages', main) : [];
+  const sites = (await listSites()).filter((site) => site.slug !== MAIN_SITE);
 
   return (
     <html lang="en">
@@ -34,6 +37,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
                   {page.title}
                 </Link>
               ))}
+            {sites.map((site) => (
+              <Link href={siteHome(site.slug)} key={site.id}>
+                {site.name}
+              </Link>
+            ))}
             <Link href="/posts">Posts</Link>
             <a href="/admin">Admin</a>
           </nav>

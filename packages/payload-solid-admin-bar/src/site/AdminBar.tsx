@@ -14,6 +14,11 @@ export type AdminBarDocumentProps = {
   id: number | string;
   /** "Edit <label>"; defaults to the collection's label from the bar's `collections`. */
   label?: string;
+  /**
+   * The document's tenant in a multi-tenant site, e.g. its location. The bar shows its name
+   * (linking to `href`, its home page), and "+ New" creates documents in it.
+   */
+  tenant?: { id: number | string; label: string; href?: string | null } | null;
 };
 
 // One page shows one document; the page sets it, the bar (in the layout) reads it
@@ -29,14 +34,31 @@ const subscribe = (listener: () => void) => {
 };
 
 /** Render in a page to tell the admin bar which document the page shows. Renders nothing. */
-export const AdminBarDocument: React.FC<AdminBarDocumentProps> = ({ collection, id, label }) => {
+export const AdminBarDocument: React.FC<AdminBarDocumentProps> = ({
+  collection,
+  id,
+  label,
+  tenant,
+}) => {
+  const tenantID = tenant?.id;
+  const tenantLabel = tenant?.label;
+  const tenantHref = tenant?.href;
+
   useEffect(() => {
-    const doc = { collection, id, label };
+    const doc: AdminBarDocumentProps = {
+      collection,
+      id,
+      label,
+      tenant:
+        tenantID !== undefined && tenantLabel !== undefined
+          ? { id: tenantID, label: tenantLabel, href: tenantHref }
+          : null,
+    };
     setCurrentDocument(doc);
     return () => {
       if (currentDocument === doc) setCurrentDocument(null);
     };
-  }, [collection, id, label]);
+  }, [collection, id, label, tenantID, tenantLabel, tenantHref]);
 
   return null;
 };
@@ -57,6 +79,27 @@ export type AdminBarProps = AdminRoutes & {
    * preview and push the page down.
    */
   showInFrames?: boolean;
+  /**
+   * The cookie Payload's multi-tenant plugin keeps the selected tenant in. "+ New" sets it to the
+   * page's tenant (`AdminBarDocument`'s `tenant`), so a new document starts in it. Only when the CMS
+   * shares the site's origin. Defaults to `payload-tenant`; false leaves it alone.
+   */
+  tenantCookie?: string | false;
+};
+
+/** Sets the tenant cookie as the multi-tenant plugin does: a year, the whole site. */
+const setTenantCookie = (name: string, id: number | string) => {
+  document.cookie = `${name}=${encodeURIComponent(String(id))}; Max-Age=31536000; Path=/; SameSite=Lax`;
+};
+
+/** Whether the CMS is on this page's origin, so its cookies are this page's cookies. */
+const sameOrigin = (cmsURL: string | undefined) => {
+  if (!cmsURL) return true;
+  try {
+    return new URL(cmsURL, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
 };
 
 /** Whether the page runs inside a frame, such as Payload's Live Preview. */
@@ -82,6 +125,7 @@ export const AdminBar: React.FC<AdminBarProps> = ({
   preview,
   showInFrames = false,
   siteName,
+  tenantCookie = 'payload-tenant',
   userCollection = 'users',
   ...routes
 }) => {
@@ -133,12 +177,20 @@ export const AdminBar: React.FC<AdminBarProps> = ({
     .filter(([slug, collection]) => collection.create !== false && can(slug, 'create'))
     .map(([slug, collection]) => ({ label: collection.label, href: links.create(slug) }));
 
+  const tenant = doc?.tenant ?? null;
+  const onCreate =
+    tenant && tenantCookie && sameOrigin(routes.cmsURL)
+      ? () => setTenantCookie(tenantCookie, tenant.id)
+      : undefined;
+
   return (
     <Bar
       create={create}
       current={current}
+      onCreate={onCreate}
       onPreviewExit={preview ? onPreviewExit : undefined}
       site={{ label: siteName, href: links.dashboard }}
+      tenant={tenant && { label: tenant.label, href: tenant.href }}
       user={{ label: state.email, account: links.account, logout: links.logout }}
     />
   );

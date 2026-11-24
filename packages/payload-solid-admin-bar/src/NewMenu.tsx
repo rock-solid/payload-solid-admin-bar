@@ -8,7 +8,10 @@ import type { BarLink } from './Bar.js';
  * The "+ New" menu: a disclosure button and its list. It closes on a click outside, on Escape
  * (giving focus back to the button) and when focus leaves it.
  */
-export const NewMenu: React.FC<{ items: BarLink[] }> = ({ items }) => {
+export const NewMenu: React.FC<{ items: BarLink[]; onSelect?: () => void }> = ({
+  items,
+  onSelect,
+}) => {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -55,7 +58,7 @@ export const NewMenu: React.FC<{ items: BarLink[] }> = ({ items }) => {
       <ul className="solid-admin-bar__dropdown" hidden={!open} id={listId}>
         {items.map((item) => (
           <li key={item.href}>
-            <a className="solid-admin-bar__item" href={item.href}>
+            <a className="solid-admin-bar__item" href={item.href} onClick={onSelect}>
               {item.label}
             </a>
           </li>
