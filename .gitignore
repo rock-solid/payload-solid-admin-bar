@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.next/
+.env
+*.db
+*.db-*
+.DS_Store
+coverage/
+.vitest-attachments/
+__screenshots__/
+demo/next-env.d.ts

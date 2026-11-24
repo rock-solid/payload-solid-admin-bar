@@ -1,0 +1,6 @@
+dist/
+pnpm-lock.yaml
+demo/.next/
+demo/src/payload-types.ts
+demo/src/app/(payload)/
+demo/next-env.d.ts

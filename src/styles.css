@@ -1,0 +1,112 @@
+/*
+ * The same strip in the admin and on the website, so it uses neither's styles. Override the
+ * custom properties on .solid-admin-bar to restyle it.
+ */
+.solid-admin-bar {
+  --solid-admin-bar-bg: #1d2327;
+  --solid-admin-bar-fg: #f0f0f1;
+  --solid-admin-bar-hover-bg: #2c3338;
+  --solid-admin-bar-accent: #72aee6;
+  --solid-admin-bar-height: 32px;
+
+  position: relative;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  min-height: var(--solid-admin-bar-height);
+  padding: 0 8px;
+  background: var(--solid-admin-bar-bg);
+  color: var(--solid-admin-bar-fg);
+  font:
+    400 13px/1 system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.solid-admin-bar ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.solid-admin-bar__group {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.solid-admin-bar__group > li {
+  position: relative;
+  display: flex;
+}
+
+.solid-admin-bar__item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--solid-admin-bar-height);
+  margin: 0;
+  padding: 0 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.solid-admin-bar__item:hover,
+.solid-admin-bar__item[aria-expanded='true'] {
+  background: var(--solid-admin-bar-hover-bg);
+  color: var(--solid-admin-bar-accent);
+}
+
+.solid-admin-bar__item:focus-visible {
+  outline: 2px solid var(--solid-admin-bar-accent);
+  outline-offset: -2px;
+}
+
+.solid-admin-bar__site {
+  font-weight: 600;
+}
+
+.solid-admin-bar__menu {
+  position: relative;
+  display: flex;
+}
+
+.solid-admin-bar__dropdown[hidden] {
+  display: none;
+}
+
+.solid-admin-bar__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  padding: 4px 0;
+  background: var(--solid-admin-bar-hover-bg);
+  box-shadow: 0 3px 5px rgb(0 0 0 / 20%);
+}
+
+.solid-admin-bar__preview {
+  color: var(--solid-admin-bar-accent);
+}
+
+.solid-admin-bar__user {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+@media (max-width: 640px) {
+  .solid-admin-bar__user {
+    display: none;
+  }
+}

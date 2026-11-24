@@ -1,0 +1,10 @@
+# The package is the root; demo/ is a Payload + Next.js site that uses it from the workspace
+packages:
+  - demo
+
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  # The `prepare` script installs the git hooks instead
+  lefthook: false
