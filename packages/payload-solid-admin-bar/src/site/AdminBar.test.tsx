@@ -169,5 +169,22 @@ describe('AdminBar (website)', () => {
       await userEvent.click(screen.getByRole('link', { name: 'Page' }));
       expect(document.cookie).not.toContain('payload-tenant=5');
     });
+
+    it('drops a tenant link that isn’t http(s)', async () => {
+      respond(loggedIn);
+      render(
+        <>
+          <AdminBar collections={collections} showInFrames siteName="Example" />
+          <AdminBarDocument
+            collection="pages"
+            id={3}
+            tenant={{ id: 5, label: 'Harbour', href: 'javascript:alert(1)' }}
+          />
+        </>,
+      );
+
+      expect(await screen.findByText('Harbour')).not.toHaveAttribute('href');
+      expect(screen.queryByRole('link', { name: 'Harbour' })).toBeNull();
+    });
   });
 });

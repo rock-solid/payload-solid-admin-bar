@@ -1,21 +1,23 @@
-import {
-  parseCookies,
-  type CollectionSlug,
-  type Payload,
-  type PayloadRequest,
-  type SanitizedPermissions,
-  type TypedUser,
+import type {
+  CollectionSlug,
+  Payload,
+  PayloadRequest,
+  SanitizedPermissions,
+  TypedUser,
 } from 'payload';
 import type React from 'react';
 
 import { Bar, type BarLink } from '../Bar.js';
 import { adminLinks, labelText, siteHref, type PayloadLabel } from '../links.js';
+import type { AdminBarPluginOptions, AdminBarTenant } from '../plugin.js';
 import {
-  DEFAULT_TENANT_COOKIE,
-  type AdminBarPluginOptions,
-  type AdminBarTenant,
-  type AdminBarTenantsOptions,
-} from '../plugin.js';
+  findTenant,
+  hasTenantField,
+  relationID,
+  selectedTenantID,
+  tenantField,
+  tenantLink,
+} from './tenants.js';
 
 type Props = {
   adminBar?: Omit<AdminBarPluginOptions, 'enabled'>;
@@ -45,72 +47,6 @@ const hostName = (url: string) => {
   } catch {
     return 'Website';
   }
-};
-
-/** A relationship value as an id: `3`, `'abc'`, `{ id: 3 }`, or the first of a hasMany list. */
-const relationID = (value: unknown): number | string | null => {
-  const first = Array.isArray(value) ? value[0] : value;
-  if (typeof first === 'number' || typeof first === 'string') return first;
-  if (first && typeof first === 'object' && 'id' in first) {
-    const { id } = first as { id: unknown };
-    if (typeof id === 'number' || typeof id === 'string') return id;
-  }
-  return null;
-};
-
-/** A tenant read as the logged-in user, so one they may not see stays hidden. */
-const findTenant = async (
-  tenants: AdminBarTenantsOptions,
-  id: number | string | null,
-  payload: Payload,
-  req: PayloadRequest,
-): Promise<AdminBarTenant | null> => {
-  if (id === null || id === '') return null;
-
-  try {
-    const tenant = await payload.findByID({
-      collection: tenants.collection,
-      depth: 0,
-      id,
-      overrideAccess: false,
-      req,
-    });
-    return (tenant as AdminBarTenant | null) ?? null;
-  } catch {
-    return null;
-  }
-};
-
-/** The tenant selected in the admin, from the multi-tenant plugin's cookie. */
-const selectedTenantID = (
-  tenants: AdminBarTenantsOptions,
-  payload: Payload,
-  req: PayloadRequest,
-) => {
-  const value = parseCookies(req.headers).get(tenants.cookie ?? DEFAULT_TENANT_COOKIE);
-  if (!value) return null;
-  // The cookie is text; a numeric id must be a number to match
-  return payload.db.defaultIDType === 'number' && /^\d+$/.test(value) ? Number(value) : value;
-};
-
-/** The tenant item: its name, linking to its home page when `tenants.path` gives one. */
-const tenantLink = async (
-  tenants: AdminBarTenantsOptions,
-  tenant: AdminBarTenant,
-  payload: Payload,
-  req: PayloadRequest,
-  siteURL: string,
-) => {
-  const titleField = payload.collections[tenants.collection]?.config.admin?.useAsTitle;
-  const title = titleField ? tenant[titleField] : undefined;
-  const label =
-    tenants.label?.(tenant) ||
-    (typeof title === 'string' && title) ||
-    (typeof title === 'number' && String(title)) ||
-    String(tenant.id);
-
-  const path = await tenants.path?.({ tenant, req });
-  return { label, href: path ? siteHref(siteURL, path) : null };
 };
 
 /** The document on screen, read once for both its tenant and its View link. */
@@ -206,13 +142,14 @@ export const AdminHeaderBar = async ({
   const slug = collectionSlug as CollectionSlug | undefined;
   const known = slug ? options.collections?.[slug] : undefined;
   // Read the document only when the bar needs it: for its View link or its tenant
+  const docHasTenant = Boolean(slug && tenants && hasTenantField(tenants, payload, slug));
   const doc =
-    slug && docID !== undefined && req && (known?.path || tenants)
+    slug && docID !== undefined && req && (known?.path || docHasTenant)
       ? await readDocument(slug, docID, payload, req)
       : null;
 
   // The document's own tenant, so an editor sees where it lives; else the one selected
-  const docTenantID = tenants && doc ? relationID(doc[tenants.field ?? 'tenant']) : null;
+  const docTenantID = tenants && doc && docHasTenant ? relationID(doc[tenantField(tenants)]) : null;
   const tenant =
     tenants && req
       ? await findTenant(

@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { Bar } from '../Bar.js';
-import { adminLinks, type AdminRoutes } from '../links.js';
+import { adminLinks, siteHref, type AdminRoutes } from '../links.js';
+import { DEFAULT_TENANT_COOKIE } from '../plugin.js';
 
 /** The bar's markup alone, for stories and custom wrappers. */
 export { Bar, type BarProps } from '../Bar.js';
@@ -125,7 +126,7 @@ export const AdminBar: React.FC<AdminBarProps> = ({
   preview,
   showInFrames = false,
   siteName,
-  tenantCookie = 'payload-tenant',
+  tenantCookie = DEFAULT_TENANT_COOKIE,
   userCollection = 'users',
   ...routes
 }) => {
@@ -190,7 +191,10 @@ export const AdminBar: React.FC<AdminBarProps> = ({
       onCreate={onCreate}
       onPreviewExit={preview ? onPreviewExit : undefined}
       site={{ label: siteName, href: links.dashboard }}
-      tenant={tenant && { label: tenant.label, href: tenant.href }}
+      tenant={
+        // Only http(s) links, as in the admin's bar
+        tenant && { label: tenant.label, href: tenant.href ? siteHref('', tenant.href) : null }
+      }
       user={{ label: state.email, account: links.account, logout: links.logout }}
     />
   );

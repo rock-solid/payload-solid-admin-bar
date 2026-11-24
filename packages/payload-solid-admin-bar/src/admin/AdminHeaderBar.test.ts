@@ -153,7 +153,8 @@ describe('AdminHeaderBar', () => {
     const tenantPayload = {
       ...payload,
       collections: {
-        ...payload.collections,
+        pages: { config: { labels: { singular: 'Page' }, flattenedFields: [{ name: 'tenant' }] } },
+        articles: { config: { labels: { singular: 'Article' }, flattenedFields: [] } },
         locations: { config: { admin: { useAsTitle: 'name' }, labels: { singular: 'Location' } } },
       },
       db: { defaultIDType: 'number' },
@@ -258,6 +259,39 @@ describe('AdminHeaderBar', () => {
       })) as React.ReactElement<BarProps> | null;
 
       expect(element?.props.tenant).toEqual({ label: 'Site hilltop', href: null });
+    });
+
+    it('doesn’t read a document whose collection has no tenant and no View path', async () => {
+      const { bar } = await tenantProps({
+        collectionSlug: 'articles',
+        docID: 1,
+        cookie: 'payload-tenant=7',
+      });
+
+      expect(findByID).not.toHaveBeenCalledWith(
+        expect.objectContaining({ collection: 'articles' }),
+      );
+      expect(bar?.tenant?.label).toBe('Hilltop');
+    });
+
+    it('reads the cookie with the tenants collection’s own id type', async () => {
+      findByID.mockClear();
+      const textIDs = {
+        ...tenantPayload,
+        collections: {
+          ...tenantPayload.collections,
+          locations: {
+            ...(tenantPayload.collections as Record<string, object>).locations,
+            customIDType: 'text',
+          },
+        },
+      } as unknown as Payload;
+
+      await tenantProps({ cookie: 'payload-tenant=7', payload: textIDs });
+
+      expect(findByID).toHaveBeenCalledWith(
+        expect.objectContaining({ collection: 'locations', id: '7' }),
+      );
     });
   });
 });

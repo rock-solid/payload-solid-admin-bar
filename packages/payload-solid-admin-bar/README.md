@@ -130,7 +130,7 @@ adminBarPlugin<Location>({
   The bar shows its name, and "+ New" sets the multi-tenant plugin's cookie to it, so a page
   created from a location's website starts in that location, whatever was selected in the admin.
   That needs the CMS on the site's origin; `tenantCookie` names the cookie, or `false` leaves it
-  alone.
+  alone. A page without an `AdminBarDocument` (a listing, say) shows no tenant.
 
 - **Tenants on their own domains** with one CMS: the website bar asks the CMS who is logged in from
   the tenant's domain. Browsers send Payload's login cookie (`SameSite=Lax`) only between sites on

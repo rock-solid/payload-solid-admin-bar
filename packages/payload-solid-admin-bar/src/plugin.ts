@@ -22,7 +22,8 @@ export type AdminBarCollection<
   path?: (args: {
     doc: DataFromCollectionSlug<TSlug>;
     req: PayloadRequest;
-    tenant: TTenant | null;
+    /** Always passed by the bar; optional so code can call `path` without it. */
+    tenant?: TTenant | null;
   }) => string | null | undefined | Promise<string | null | undefined>;
   /** List it under "+ New" (when the user may create it). Defaults to true. */
   create?: boolean;
