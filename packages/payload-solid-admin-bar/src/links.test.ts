@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { adminLinks, labelText, siteHref } from './links';
+import { adminLinks, labelText, siteHref } from './links.js';
 
 describe('adminLinks', () => {
   it('builds same-origin links with Payload’s default routes', () => {

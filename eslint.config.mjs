@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     ignores: [
-      'dist/',
+      '**/dist/',
       'coverage/',
       'demo/.next/',
       'demo/src/payload-types.ts',
@@ -31,7 +31,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/**/*.tsx', 'demo/src/**/*.tsx'],
+    files: ['packages/*/src/**/*.tsx', 'demo/src/**/*.tsx'],
     extends: [reactHooks.configs.flat.recommended],
   },
   {

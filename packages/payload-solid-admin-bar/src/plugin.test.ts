@@ -1,7 +1,7 @@
 import type { Config } from 'payload';
 import { describe, expect, it } from 'vitest';
 
-import { ADMIN_BAR_COMPONENT, adminBarPlugin } from './plugin';
+import { ADMIN_BAR_COMPONENT, adminBarPlugin } from './plugin.js';
 
 const config = {
   admin: { components: { header: ['/existing#Header'], actions: ['/x#Action'] } },

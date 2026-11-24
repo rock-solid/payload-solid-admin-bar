@@ -1,6 +1,6 @@
 import type React from 'react';
 
-import { NewMenu } from './NewMenu';
+import { NewMenu } from './NewMenu.js';
 
 import './styles.css';
 

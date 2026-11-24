@@ -31,13 +31,12 @@ jobs:
         run: pnpm format:check
       - name: Lint
         run: pnpm lint
+      # Builds the package between the two: the demo's types come from its dist/
       - name: Typecheck (package and demo)
         run: pnpm typecheck
       # Component tests run in the runner's Google Chrome (see vitest.config.mts)
       - name: Tests
         run: pnpm test
-      - name: Build the package
-        run: pnpm build
-      # The demo uses the package from the workspace, the way a site would
-      - name: Build the demo
+      # The demo installs the built package from the workspace, as a site installs it from npm
+      - name: Build the package and the demo
         run: pnpm demo:build

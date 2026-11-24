@@ -10,3 +10,4 @@ coverage/
 .vitest-attachments/
 __screenshots__/
 demo/next-env.d.ts
+lefthook-local.yml

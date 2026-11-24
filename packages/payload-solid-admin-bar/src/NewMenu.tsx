@@ -2,7 +2,7 @@
 
 import React, { useEffect, useId, useRef, useState } from 'react';
 
-import type { BarLink } from './Bar';
+import type { BarLink } from './Bar.js';
 
 /**
  * The "+ New" menu: a disclosure button and its list. It closes on a click outside, on Escape

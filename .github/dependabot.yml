@@ -1,0 +1,15 @@
+# Weekly PRs that update the GitHub Actions the workflows use, grouped into one. npm dependencies
+# only get Dependabot's security alerts: it can't update pnpm 12's lockfile, so its npm PRs fail
+# CI's frozen install, and those updates are made by hand. Its titles start with "Bump"; the PR
+# title check accepts that subject and checks the rest (commitlint.config.mjs).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci

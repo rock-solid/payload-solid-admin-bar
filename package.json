@@ -1,91 +1,36 @@
 {
-  "name": "payload-solid-admin-bar",
-  "version": "0.1.0",
+  "name": "payload-solid-admin-bar-workspace",
   "private": true,
-  "description": "A WordPress-style admin bar for Payload CMS, the same in the admin and on the website: visit site, edit or view the current document, create new documents, exit preview and log out",
-  "keywords": [
-    "payload",
-    "payload-plugin",
-    "admin-bar",
-    "nextjs"
-  ],
-  "license": "UNLICENSED",
   "type": "module",
   "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": ">=22.18"
   },
-  "sideEffects": [
-    "*.css"
-  ],
-  "files": [
-    "dist"
-  ],
-  "exports": {
-    "./plugin": "./src/plugin.ts",
-    "./admin": "./src/admin/AdminHeaderBar.tsx",
-    "./site": "./src/site/AdminBar.tsx",
-    "./package.json": "./package.json"
-  },
-  "publishConfig": {
-    "exports": {
-      "./plugin": {
-        "types": "./dist/plugin.d.ts",
-        "default": "./dist/plugin.js"
-      },
-      "./admin": {
-        "types": "./dist/admin/AdminHeaderBar.d.ts",
-        "default": "./dist/admin/AdminHeaderBar.js"
-      },
-      "./site": {
-        "types": "./dist/site/AdminBar.d.ts",
-        "default": "./dist/site/AdminBar.js"
-      },
-      "./package.json": "./package.json"
-    }
-  },
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json && swc ./src -d ./dist --config-file .swcrc --strip-leading-paths --ignore \"**/*.test.ts,**/*.test.tsx\" && copyfiles -u 1 \"src/**/*.css\" dist/",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "demo": "pnpm --filter demo dev",
-    "demo:build": "pnpm --filter demo build",
+    "build": "pnpm --filter @rocksoliddigital/payload-solid-admin-bar build",
+    "changeset": "changeset",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm demo:build",
+    "demo": "pnpm build && pnpm --filter demo dev",
+    "demo:build": "pnpm build && pnpm --filter demo build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "prepare": "if git rev-parse --git-dir >/dev/null 2>&1 && command -v lefthook >/dev/null 2>&1; then lefthook install; fi",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && pnpm --filter demo typecheck"
-  },
-  "peerDependencies": {
-    "payload": "^3.90.0",
-    "react": "^19.0.0"
+    "test": "pnpm --filter @rocksoliddigital/payload-solid-admin-bar test",
+    "typecheck": "pnpm --filter @rocksoliddigital/payload-solid-admin-bar typecheck && pnpm build && pnpm --filter demo typecheck",
+    "version-packages": "changeset version && node scripts/format-changelog.mjs"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^9.39.0",
-    "@swc/cli": "^0.7.8",
-    "@swc/core": "^1.13.5",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "16.3.0",
-    "@types/react": "19.2.14",
-    "@vitejs/plugin-react": "4.5.2",
-    "@vitest/browser": "4.1.11",
-    "@vitest/browser-playwright": "4.1.11",
-    "copyfiles": "^2.4.1",
     "eslint": "^9.39.0",
     "eslint-plugin-react-hooks": "^7.0.0",
     "globals": "^16.4.0",
     "lefthook": "^2.1.15",
-    "payload": "3.92.0",
-    "playwright": "1.58.2",
     "prettier": "^3.6.2",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "rimraf": "^6.0.1",
     "typescript": "5.7.3",
-    "typescript-eslint": "^8.46.0",
-    "vitest": "4.1.11"
+    "typescript-eslint": "^8.46.0"
   }
 }

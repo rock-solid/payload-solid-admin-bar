@@ -7,9 +7,9 @@ import type {
 } from 'payload';
 import type React from 'react';
 
-import { Bar, type BarLink } from '../Bar';
-import { adminLinks, labelText, siteHref, type PayloadLabel } from '../links';
-import type { AdminBarPluginOptions } from '../plugin';
+import { Bar, type BarLink } from '../Bar.js';
+import { adminLinks, labelText, siteHref, type PayloadLabel } from '../links.js';
+import type { AdminBarPluginOptions } from '../plugin.js';
 
 type Props = {
   adminBar?: Omit<AdminBarPluginOptions, 'enabled'>;

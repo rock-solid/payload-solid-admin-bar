@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 
-import { AdminBar, AdminBarDocument, isFramed } from './AdminBar';
+import { AdminBar, AdminBarDocument, isFramed } from './AdminBar.js';
 
 const respond = (routes: Record<string, unknown>) =>
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {

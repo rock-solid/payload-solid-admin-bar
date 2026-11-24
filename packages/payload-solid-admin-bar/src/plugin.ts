@@ -39,7 +39,7 @@ export type AdminBarPluginOptions = {
   enabled?: boolean;
 };
 
-export const ADMIN_BAR_COMPONENT = 'payload-solid-admin-bar/admin#AdminHeaderBar';
+export const ADMIN_BAR_COMPONENT = '@rocksoliddigital/payload-solid-admin-bar/admin#AdminHeaderBar';
 
 /** Puts the admin bar across the top of every admin screen. */
 export const adminBarPlugin =
