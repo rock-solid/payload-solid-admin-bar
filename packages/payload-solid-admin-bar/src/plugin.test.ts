@@ -28,4 +28,15 @@ describe('adminBarPlugin', () => {
   it('leaves the config alone when disabled', () => {
     expect(adminBarPlugin({ enabled: false })(config)).toBe(config);
   });
+
+  it('adds the tenants endpoint only with `tenants`', () => {
+    const withTenants = adminBarPlugin({ tenants: { collection: 'locations' as never } })(
+      config,
+    ) as Config;
+
+    expect(withTenants.endpoints).toEqual([
+      expect.objectContaining({ method: 'get', path: '/admin-bar/tenants' }),
+    ]);
+    expect((adminBarPlugin()(config) as Config).endpoints).toBeUndefined();
+  });
 });

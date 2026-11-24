@@ -186,5 +186,30 @@ describe('AdminBar (website)', () => {
       expect(await screen.findByText('Harbour')).not.toHaveAttribute('href');
       expect(screen.queryByRole('link', { name: 'Harbour' })).toBeNull();
     });
+
+    it('lists the user’s tenants when asked, from the plugin’s endpoint', async () => {
+      const fetch = respond({
+        ...loggedIn,
+        '/api/admin-bar/tenants': { tenants: [{ id: 1, label: 'Global', href: '/' }, tenant] },
+      });
+      render(
+        <>
+          <AdminBar collections={collections} listTenants showInFrames siteName="Example" />
+          <AdminBarDocument collection="pages" id={3} tenant={tenant} />
+        </>,
+      );
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Harbour' }));
+      expect(screen.getByRole('link', { name: 'Visit Global' })).toHaveAttribute('href', '/');
+      expect(fetch).toHaveBeenCalledWith('/api/admin-bar/tenants', expect.anything());
+    });
+
+    it('doesn’t ask for tenants unless told to', async () => {
+      const fetch = respond(loggedIn);
+      render(<AdminBar collections={collections} showInFrames siteName="Example" />);
+
+      await screen.findByRole('link', { name: 'Example' });
+      expect(fetch).not.toHaveBeenCalledWith('/api/admin-bar/tenants', expect.anything());
+    });
   });
 });

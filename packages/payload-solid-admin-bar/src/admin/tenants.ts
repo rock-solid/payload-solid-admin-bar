@@ -1,11 +1,9 @@
 import { parseCookies, type CollectionSlug, type Payload, type PayloadRequest } from 'payload';
 
+import { DEFAULT_TENANT_COOKIE } from '../constants.js';
 import { siteHref } from '../links.js';
-import {
-  DEFAULT_TENANT_COOKIE,
-  type AdminBarTenant,
-  type AdminBarTenantsOptions,
-} from '../plugin.js';
+import type { AdminBarTenant, AdminBarTenantsOptions } from '../plugin.js';
+import type { BarTenant } from '../TenantMenu.js';
 
 /** The field on documents that holds their tenant. */
 export const tenantField = (tenants: AdminBarTenantsOptions) => tenants.field ?? 'tenant';
@@ -88,4 +86,52 @@ export const tenantLink = async (
 
   const path = await tenants.path?.({ tenant, req });
   return { label, href: path ? siteHref(siteURL, path) : null };
+};
+
+/**
+ * Every tenant the user may work on, as the multi-tenant plugin's tenant selector lists them: all
+ * of them for a user `userHasAccessToAllTenants` lets through, else those in the user's tenants
+ * array. Read as the user, sorted by name.
+ */
+export const listUserTenants = async (
+  tenants: AdminBarTenantsOptions,
+  payload: Payload,
+  req: PayloadRequest,
+  siteURL: string,
+): Promise<BarTenant[]> => {
+  const { user } = req;
+  if (!user) return [];
+
+  let ids: (number | string)[] | undefined;
+  if (!tenants.userHasAccessToAllTenants?.(user)) {
+    const rows = (user as unknown as Record<string, unknown>)[tenants.arrayField ?? 'tenants'];
+    ids = (Array.isArray(rows) ? rows : [])
+      .map((row: unknown) =>
+        relationID((row as Record<string, unknown> | null)?.[tenants.arrayTenantField ?? 'tenant']),
+      )
+      .filter((id): id is number | string => id !== null);
+    if (!ids.length) return [];
+  }
+
+  const titleField = payload.collections[tenants.collection]?.config.admin?.useAsTitle;
+  try {
+    const { docs } = await payload.find({
+      collection: tenants.collection,
+      depth: 0,
+      overrideAccess: false,
+      pagination: false,
+      req,
+      ...(titleField && { sort: titleField }),
+      ...(ids && { where: { id: { in: ids } } }),
+    });
+
+    return Promise.all(
+      (docs as AdminBarTenant[]).map(async (tenant) => ({
+        id: tenant.id,
+        ...(await tenantLink(tenants, tenant, payload, req, siteURL)),
+      })),
+    );
+  } catch {
+    return [];
+  }
 };

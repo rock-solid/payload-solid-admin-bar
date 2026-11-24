@@ -4,7 +4,10 @@ import type {
   Payload,
   PayloadRequest,
   Plugin,
+  TypedUser,
 } from 'payload';
+
+import { tenantsEndpoint } from './admin/endpoint.js';
 
 /** A tenant document as the bar reads it (depth 0): its id and its fields. */
 export type AdminBarTenant = { id: number | string; [field: string]: unknown };
@@ -52,6 +55,16 @@ export type AdminBarTenantsOptions<TTenant extends { id: number | string } = Adm
     tenant: TTenant;
     req: PayloadRequest;
   }) => string | null | undefined | Promise<string | null | undefined>;
+  /**
+   * The same as the multi-tenant plugin's option: users it lets through may work on every tenant;
+   * the others only on those in their tenants array. Decides what "My sites" lists. Defaults to
+   * nobody.
+   */
+  userHasAccessToAllTenants?: (user: TypedUser) => boolean;
+  /** The users' tenants array, as in the multi-tenant plugin. Defaults to `tenants`. */
+  arrayField?: string;
+  /** The tenant field in each row of that array. Defaults to `tenant`. */
+  arrayTenantField?: string;
 };
 
 export type AdminBarPluginOptions<TTenant extends { id: number | string } = AdminBarTenant> = {
@@ -81,8 +94,7 @@ export type AdminBarPluginOptions<TTenant extends { id: number | string } = Admi
 
 export const ADMIN_BAR_COMPONENT = '@rocksoliddigital/payload-solid-admin-bar/admin#AdminHeaderBar';
 
-/** The cookie Payload's multi-tenant plugin keeps the selected tenant in. */
-export const DEFAULT_TENANT_COOKIE = 'payload-tenant';
+export { DEFAULT_TENANT_COOKIE, TENANTS_ENDPOINT } from './constants.js';
 
 /** Puts the admin bar across the top of every admin screen. */
 export const adminBarPlugin =
@@ -96,6 +108,10 @@ export const adminBarPlugin =
 
     return {
       ...config,
+      // "My sites" on the website asks this which tenants the user may work on
+      endpoints: options.tenants
+        ? [...(config.endpoints ?? []), tenantsEndpoint(options as AdminBarPluginOptions)]
+        : config.endpoints,
       admin: {
         ...config.admin,
         components: {

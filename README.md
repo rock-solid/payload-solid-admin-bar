@@ -38,7 +38,9 @@ start: log in at <http://localhost:3100/admin> as `demo@example.com` / `demo`, t
   **Exit preview**;
 - open **Live Preview** on any page or post: the preview shows the site without a second bar;
 - the demo is multi-tenant, with a second site under `/harbour`: on a Harbour page the bar names
-  Harbour, and **+ New → Page** creates the page in Harbour, whatever site the admin has selected.
+  Harbour, and **+ New → Page** creates the page in Harbour, whatever site the admin has selected;
+- the site's name in the bar opens **My sites** (Visit, Manage) for `demo@example.com`;
+  `editor@example.com` (same password) works on Harbour only, so it gets no menu.
 
 ## 🧰 Development
 

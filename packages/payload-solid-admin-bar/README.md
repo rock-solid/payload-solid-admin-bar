@@ -132,6 +132,23 @@ adminBarPlugin<Location>({
   That needs the CMS on the site's origin; `tenantCookie` names the cookie, or `false` leaves it
   alone. A page without an `AdminBarDocument` (a listing, say) shows no tenant.
 
+- **My sites**, as in WordPress: when the user works on more than one tenant, the tenant's name
+  opens a menu of all of them, each with **Visit** (its home page) and **Manage** (the admin,
+  switched to it). It lists what the multi-tenant plugin's tenant selector lists, so give the bar
+  the same rule:
+
+  ```ts
+  tenants: {
+    collection: 'locations',
+    userHasAccessToAllTenants: (user) => user.roles?.includes('admin'), // as in the plugin
+    // arrayField / arrayTenantField: the users' tenants array, if renamed in the plugin
+  },
+  ```
+
+  On the website, pass `listTenants` to `<AdminBar>`: it reads the list from
+  `GET /api/admin-bar/tenants`, which the plugin adds with `tenants`. Manage needs the CMS on the
+  site's origin, like "+ New".
+
 - **Tenants on their own domains** with one CMS: the website bar asks the CMS who is logged in from
   the tenant's domain. Browsers send Payload's login cookie (`SameSite=Lax`) only between sites on
   the same registrable domain (`cms.example.com` and `harbour.example.com`), so on separate domains

@@ -1,3 +1,5 @@
+import { TENANTS_ENDPOINT } from './constants.js';
+
 /** Where the admin lives, as the bar builds its links: the CMS origin and Payload's routes. */
 export type AdminRoutes = {
   /** The CMS origin, e.g. `https://cms.example.com`; '' for links on the same origin. */
@@ -58,6 +60,7 @@ export const adminLinks = ({
       ),
     me: (userCollection: string) => join(cmsURL, api, encodeURIComponent(userCollection), 'me'),
     access: join(cmsURL, api, 'access'),
+    tenants: join(cmsURL, api, TENANTS_ENDPOINT),
   };
 };
 

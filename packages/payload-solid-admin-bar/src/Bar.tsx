@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import { NewMenu } from './NewMenu.js';
+import { TenantMenu, type BarTenant } from './TenantMenu.js';
 
 import './styles.css';
 
@@ -10,7 +11,14 @@ export type BarProps = {
   /** The site's name; links to the website in the admin and to the dashboard on the website. */
   site: BarLink;
   /** The tenant on screen in a multi-tenant site, e.g. a location; links to its home page. */
-  tenant?: { label: string; href?: string | null } | null;
+  tenant?: { id?: number | string; label: string; href?: string | null } | null;
+  /**
+   * Every tenant the user may work on. With more than one, the tenant item becomes "My sites": a
+   * menu with each one's home page (Visit) and, given `tenantMenu`, Manage.
+   */
+  tenants?: BarTenant[];
+  /** For Manage: the admin dashboard and the multi-tenant plugin's cookie (null: no Manage). */
+  tenantMenu?: { dashboard: string; cookie: string | null };
   /** Edit (on the website) or View (in the admin) for the document on screen. */
   current?: BarLink | null;
   /** The collections the user may create, for the "+ New" menu. */
@@ -40,6 +48,8 @@ export const Bar: React.FC<BarProps> = ({
   site,
   siteInNewTab,
   tenant,
+  tenantMenu,
+  tenants = [],
   user,
 }) => (
   <nav
@@ -56,20 +66,32 @@ export const Bar: React.FC<BarProps> = ({
           {site.label}
         </a>
       </li>
-      {tenant && (
+      {tenants.length > 1 ? (
         <li>
-          {tenant.href ? (
-            <a
-              className="solid-admin-bar__item solid-admin-bar__tenant"
-              href={tenant.href}
-              {...(siteInNewTab && newTab)}
-            >
-              {tenant.label}
-            </a>
-          ) : (
-            <span className="solid-admin-bar__item solid-admin-bar__tenant">{tenant.label}</span>
-          )}
+          <TenantMenu
+            cookie={tenantMenu?.cookie ?? null}
+            current={tenant}
+            dashboard={tenantMenu?.dashboard ?? '/admin'}
+            siteInNewTab={siteInNewTab}
+            tenants={tenants}
+          />
         </li>
+      ) : (
+        tenant && (
+          <li>
+            {tenant.href ? (
+              <a
+                className="solid-admin-bar__item solid-admin-bar__tenant"
+                href={tenant.href}
+                {...(siteInNewTab && newTab)}
+              >
+                {tenant.label}
+              </a>
+            ) : (
+              <span className="solid-admin-bar__item solid-admin-bar__tenant">{tenant.label}</span>
+            )}
+          </li>
+        )
       )}
       {current && (
         <li>
