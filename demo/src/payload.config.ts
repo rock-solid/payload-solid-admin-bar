@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 import { sqliteAdapter } from '@payloadcms/db-sqlite';
 import { buildConfig } from 'payload';
-import { adminBarPlugin } from 'payload-solid-admin-bar/plugin';
+import { adminBarPlugin } from '@rocksoliddigital/payload-solid-admin-bar/plugin';
 
 import { Categories } from './collections/Categories';
 import { Pages } from './collections/Pages';

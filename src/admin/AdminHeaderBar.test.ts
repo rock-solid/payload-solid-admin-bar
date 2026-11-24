@@ -2,8 +2,8 @@ import type { Payload, PayloadRequest } from 'payload';
 import type React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { BarProps } from '../Bar';
-import { AdminHeaderBar } from './AdminHeaderBar';
+import type { BarProps } from '../Bar.js';
+import { AdminHeaderBar } from './AdminHeaderBar.js';
 
 const findByID = vi.fn();
 

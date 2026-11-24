@@ -1,7 +1,8 @@
 # Demo
 
-A small Payload + Next.js site that uses `payload-solid-admin-bar` from the workspace. Run it from
-the repo root with `pnpm demo`; see the root README for what to try.
+A small Payload + Next.js site that uses `@rocksoliddigital/payload-solid-admin-bar` from the workspace, built, as npm installs it. Run it from the repo root with `pnpm demo`, which
+builds the package first; after changing `src/`, run `pnpm build` again. See the root README for
+what to try.
 
 - `src/payload.config.ts`: the plugin's options (admin side).
 - `src/components/SiteAdminBar.tsx`: the website bar.

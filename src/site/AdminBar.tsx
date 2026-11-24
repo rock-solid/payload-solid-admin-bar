@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 
-import { Bar } from '../Bar';
-import { adminLinks, type AdminRoutes } from '../links';
+import { Bar } from '../Bar.js';
+import { adminLinks, type AdminRoutes } from '../links.js';
 
 /** The bar's markup alone, for stories and custom wrappers. */
-export { Bar, type BarProps } from '../Bar';
+export { Bar, type BarProps } from '../Bar.js';
 
 /** The document a page shows, for the bar's "Edit" link. */
 export type AdminBarDocumentProps = {

@@ -1,4 +1,6 @@
-# payload-solid-admin-bar
+# @rocksoliddigital/payload-solid-admin-bar
+
+[![npm](https://img.shields.io/npm/v/@rocksoliddigital/payload-solid-admin-bar)](https://www.npmjs.com/package/@rocksoliddigital/payload-solid-admin-bar)
 
 A WordPress-style admin bar for [Payload CMS](https://payloadcms.com). The same dark strip shows
 across the top of every admin screen and, for logged-in editors, across the top of the website:
@@ -16,11 +18,13 @@ Payload's own `@payloadcms/admin-bar` covers only the website side, for one coll
 ## Try the demo
 
 ```sh
+git clone https://github.com/rock-solid/payload-solid-admin-bar.git
+cd payload-solid-admin-bar
 pnpm install
 pnpm demo        # http://localhost:3100
 ```
 
-The demo is a small Payload + Next.js site in [`demo/`](demo) on SQLite, so it needs no database
+The demo is a small Payload + Next.js site in [`demo/`](https://github.com/rock-solid/payload-solid-admin-bar/tree/main/demo) on SQLite, so it needs no database
 server or `.env` (copy `demo/.env.example` to change the secrets). An empty database is seeded on
 start: log in at <http://localhost:3100/admin> as `demo@example.com` / `demo`, then:
 
@@ -31,14 +35,17 @@ start: log in at <http://localhost:3100/admin> as `demo@example.com` / `demo`, t
 
 ## Install
 
-Not on npm yet. In a pnpm workspace, add it as a workspace package; Next.js needs
-`transpilePackages: ['payload-solid-admin-bar']` while it ships TypeScript source.
+```sh
+pnpm add @rocksoliddigital/payload-solid-admin-bar
+```
+
+It needs Payload 3 and React 19.
 
 ## Admin
 
 ```ts
 // payload.config.ts
-import { adminBarPlugin } from 'payload-solid-admin-bar/plugin';
+import { adminBarPlugin } from '@rocksoliddigital/payload-solid-admin-bar/plugin';
 
 plugins: [
   adminBarPlugin({
@@ -72,7 +79,7 @@ fixed bar would cover).
 ```tsx
 // a client wrapper in the site's layout, so it can pass onPreviewExit
 'use client';
-import { AdminBar } from 'payload-solid-admin-bar/site';
+import { AdminBar } from '@rocksoliddigital/payload-solid-admin-bar/site';
 
 <AdminBar
   siteName="Example"
@@ -84,7 +91,7 @@ import { AdminBar } from 'payload-solid-admin-bar/site';
 
 ```tsx
 // in each page: which document it shows, for the Edit link
-import { AdminBarDocument } from 'payload-solid-admin-bar/site';
+import { AdminBarDocument } from '@rocksoliddigital/payload-solid-admin-bar/site';
 
 <AdminBarDocument collection="pages" id={page.id} />;
 ```
@@ -111,10 +118,10 @@ pnpm check   # format, lint, typecheck (package + demo), tests, build
 ```
 
 Component tests run in Chromium through Vitest's browser mode; the first time, run
-`pnpm exec playwright install chromium`.
+`pnpm exec playwright install chromium`. Releases go through Changesets: a PR that changes the
+package adds one with `pnpm changeset`, and the Release workflow publishes the Version Packages PR.
 
 ## Not yet
 
-- Publishing to npm (`publishConfig.exports` already points at `dist/`).
 - Multi-tenancy beyond `siteURL`: showing the tenant, and a website bar per tenant.
 - Globals (View/Edit for a global).

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 
-import { NewMenu } from './NewMenu';
+import { NewMenu } from './NewMenu.js';
 
 const items = [
   { label: 'Page', href: '/admin/collections/pages/create' },

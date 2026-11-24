@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@4.0.1/schema.json",
+  "changelog": [
+    "./changelog.mjs",
+    {
+      "repo": "rock-solid/payload-solid-admin-bar"
+    }
+  ],
+  "commit": false,
+  "fixed": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "privatePackages": false
+}

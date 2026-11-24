@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { AdminBarDocument } from 'payload-solid-admin-bar/site';
+import { AdminBarDocument } from '@rocksoliddigital/payload-solid-admin-bar/site';
 
 import { findBySlug } from '@/data';
 

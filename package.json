@@ -1,7 +1,6 @@
 {
-  "name": "payload-solid-admin-bar",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@rocksoliddigital/payload-solid-admin-bar",
+  "version": "0.0.0",
   "description": "A WordPress-style admin bar for Payload CMS, the same in the admin and on the website: visit site, edit or view the current document, create new documents, exit preview and log out",
   "keywords": [
     "payload",
@@ -9,7 +8,13 @@
     "admin-bar",
     "nextjs"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rock-solid/payload-solid-admin-bar.git"
+  },
+  "homepage": "https://github.com/rock-solid/payload-solid-admin-bar#readme",
+  "bugs": "https://github.com/rock-solid/payload-solid-admin-bar/issues",
   "type": "module",
   "packageManager": "pnpm@12.8.1",
   "engines": {
@@ -19,49 +24,48 @@
     "*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "exports": {
-    "./plugin": "./src/plugin.ts",
-    "./admin": "./src/admin/AdminHeaderBar.tsx",
-    "./site": "./src/site/AdminBar.tsx",
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./admin": {
+      "types": "./dist/admin/AdminHeaderBar.d.ts",
+      "default": "./dist/admin/AdminHeaderBar.js"
+    },
+    "./site": {
+      "types": "./dist/site/AdminBar.d.ts",
+      "default": "./dist/site/AdminBar.js"
+    },
     "./package.json": "./package.json"
   },
   "publishConfig": {
-    "exports": {
-      "./plugin": {
-        "types": "./dist/plugin.d.ts",
-        "default": "./dist/plugin.js"
-      },
-      "./admin": {
-        "types": "./dist/admin/AdminHeaderBar.d.ts",
-        "default": "./dist/admin/AdminHeaderBar.js"
-      },
-      "./site": {
-        "types": "./dist/site/AdminBar.d.ts",
-        "default": "./dist/site/AdminBar.js"
-      },
-      "./package.json": "./package.json"
-    }
+    "access": "public"
   },
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json && swc ./src -d ./dist --config-file .swcrc --strip-leading-paths --ignore \"**/*.test.ts,**/*.test.tsx\" && copyfiles -u 1 \"src/**/*.css\" dist/",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-    "demo": "pnpm --filter demo dev",
-    "demo:build": "pnpm --filter demo build",
+    "changeset": "changeset",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm demo:build",
+    "demo": "pnpm build && pnpm --filter demo dev",
+    "demo:build": "pnpm build && pnpm --filter demo build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "prepare": "if git rev-parse --git-dir >/dev/null 2>&1 && command -v lefthook >/dev/null 2>&1; then lefthook install; fi",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && pnpm --filter demo typecheck"
+    "typecheck": "tsc --noEmit && pnpm build && pnpm --filter demo typecheck",
+    "version-packages": "changeset version && node scripts/format-changelog.mjs"
   },
   "peerDependencies": {
     "payload": "^3.90.0",
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "@eslint/js": "^9.39.0",
