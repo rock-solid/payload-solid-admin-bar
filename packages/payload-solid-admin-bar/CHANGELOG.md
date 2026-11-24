@@ -1,5 +1,15 @@
 # @rocksoliddigital/payload-solid-admin-bar
 
+## 0.2.0
+
+### 🚀 Features
+
+- Multi-tenancy with Payload's multi-tenant plugin: a `tenants` option names the tenant on screen and links to its home page, each `path` gets the document's tenant, and on the website `AdminBarDocument`'s `tenant` makes "+ New" create documents in the page's tenant ([#3](https://github.com/rock-solid/payload-solid-admin-bar/pull/3)) ([75c39e0](https://github.com/rock-solid/payload-solid-admin-bar/commit/75c39e02887d5f345ee2482dcff81e8dab0aa41c))
+
+### 🤝 Contributors
+
+- Adrian Cando (@godhand1607)
+
 ## 0.1.0
 
 ### 🚀 Features
