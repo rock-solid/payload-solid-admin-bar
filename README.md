@@ -36,7 +36,9 @@ start: log in at <http://localhost:3100/admin> as `demo@example.com` / `demo`, t
 - open **About** in the admin: the bar has **View page**; the site's bar has **Edit page**;
 - open **Coming soon** (a draft): no **View page**; its Preview opens the site in draft mode with
   **Exit preview**;
-- open **Live Preview** on any page or post: the preview shows the site without a second bar.
+- open **Live Preview** on any page or post: the preview shows the site without a second bar;
+- the demo is multi-tenant, with a second site under `/harbour`: on a Harbour page the bar names
+  Harbour, and **+ New → Page** creates the page in Harbour, whatever site the admin has selected.
 
 ## 🧰 Development
 

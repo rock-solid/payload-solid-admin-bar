@@ -211,6 +211,9 @@ importers:
       '@payloadcms/next':
         specifier: 3.92.0
         version: 3.92.0(@types/react@19.2.14)(graphql@16.15.0)(monaco-editor@0.57.0)(next@16.4.1(@babel/core@7.29.13(supports-color@7.2.0))(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@7.2.0)(typescript@5.7.3)
+      '@payloadcms/plugin-multi-tenant':
+        specifier: 3.92.0
+        version: 3.92.0(@payloadcms/ui@3.92.0(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.4.1(@babel/core@7.29.13(supports-color@7.2.0))(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@7.2.0)(typescript@5.7.3))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))
       '@payloadcms/ui':
         specifier: 3.92.0
         version: 3.92.0(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.4.1(@babel/core@7.29.13(supports-color@7.2.0))(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@7.2.0)(typescript@5.7.3)
@@ -1643,6 +1646,12 @@ packages:
     peerDependencies:
       graphql: ^16.8.1
       next: '>=15.2.9 <15.3.0 || >=15.3.9 <15.4.0 || >=15.4.11 <15.5.0 || >=16.3.3 <17.0.0'
+      payload: 3.92.0
+
+  '@payloadcms/plugin-multi-tenant@3.92.0':
+    resolution: {integrity: sha512-zrrHd1qELVoI5+kUCvw4yW3XZnkQhL9BIsn42ppCotXO4rR9YVeowvpLG3Et+U0eJeuSM0wvfIrQaivfTfinfQ==}
+    peerDependencies:
+      '@payloadcms/ui': 3.92.0
       payload: 3.92.0
 
   '@payloadcms/translations@3.92.0':
@@ -5544,6 +5553,11 @@ snapshots:
       - react-dom
       - supports-color
       - typescript
+
+  '@payloadcms/plugin-multi-tenant@3.92.0(@payloadcms/ui@3.92.0(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.4.1(@babel/core@7.29.13(supports-color@7.2.0))(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@7.2.0)(typescript@5.7.3))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))':
+    dependencies:
+      '@payloadcms/ui': 3.92.0(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.4.1(@babel/core@7.29.13(supports-color@7.2.0))(@types/node@22.20.5)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@7.2.0)(typescript@5.7.3)
+      payload: 3.92.0(graphql@16.15.0)(supports-color@7.2.0)(typescript@5.7.3)
 
   '@payloadcms/translations@3.92.0':
     dependencies:

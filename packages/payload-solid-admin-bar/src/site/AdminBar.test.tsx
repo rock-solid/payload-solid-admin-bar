@@ -95,4 +95,96 @@ describe('AdminBar (website)', () => {
     expect(fetch).not.toHaveBeenCalled();
     expect(container).toBeEmptyDOMElement();
   });
+
+  describe('with a tenant', () => {
+    const tenant = { id: 5, label: 'Harbour', href: '/harbour' };
+    const clearCookie = () => {
+      document.cookie = 'payload-tenant=; Max-Age=0; Path=/';
+    };
+    // Keep the test page where it is when a link is followed
+    const stayOnPage = (event: Event) => event.preventDefault();
+
+    afterEach(() => {
+      clearCookie();
+      document.removeEventListener('click', stayOnPage);
+    });
+
+    it('names the page’s tenant and creates new documents in it', async () => {
+      respond(loggedIn);
+      document.addEventListener('click', stayOnPage);
+      render(
+        <>
+          <AdminBar collections={collections} showInFrames siteName="Example" />
+          <AdminBarDocument collection="pages" id={3} tenant={tenant} />
+        </>,
+      );
+
+      expect(await screen.findByRole('link', { name: 'Harbour' })).toHaveAttribute(
+        'href',
+        '/harbour',
+      );
+      expect(document.cookie).not.toContain('payload-tenant=5');
+
+      await userEvent.click(screen.getByRole('button', { name: 'New' }));
+      await userEvent.click(screen.getByRole('link', { name: 'Page' }));
+      expect(document.cookie).toContain('payload-tenant=5');
+    });
+
+    it('leaves the cookie alone for a CMS on another origin, or when told to', async () => {
+      respond({
+        'https://cms.example.com/api/users/me': loggedIn['/api/users/me'],
+        'https://cms.example.com/api/access': loggedIn['/api/access'],
+        ...loggedIn,
+      });
+      document.addEventListener('click', stayOnPage);
+      const { unmount } = render(
+        <>
+          <AdminBar
+            cmsURL="https://cms.example.com"
+            collections={collections}
+            showInFrames
+            siteName="Example"
+          />
+          <AdminBarDocument collection="pages" id={3} tenant={tenant} />
+        </>,
+      );
+
+      await userEvent.click(await screen.findByRole('button', { name: 'New' }));
+      await userEvent.click(screen.getByRole('link', { name: 'Page' }));
+      expect(document.cookie).not.toContain('payload-tenant=5');
+      unmount();
+
+      render(
+        <>
+          <AdminBar
+            collections={collections}
+            showInFrames
+            siteName="Example"
+            tenantCookie={false}
+          />
+          <AdminBarDocument collection="pages" id={3} tenant={tenant} />
+        </>,
+      );
+      await userEvent.click(await screen.findByRole('button', { name: 'New' }));
+      await userEvent.click(screen.getByRole('link', { name: 'Page' }));
+      expect(document.cookie).not.toContain('payload-tenant=5');
+    });
+
+    it('drops a tenant link that isn’t http(s)', async () => {
+      respond(loggedIn);
+      render(
+        <>
+          <AdminBar collections={collections} showInFrames siteName="Example" />
+          <AdminBarDocument
+            collection="pages"
+            id={3}
+            tenant={{ id: 5, label: 'Harbour', href: 'javascript:alert(1)' }}
+          />
+        </>,
+      );
+
+      expect(await screen.findByText('Harbour')).not.toHaveAttribute('href');
+      expect(screen.queryByRole('link', { name: 'Harbour' })).toBeNull();
+    });
+  });
 });

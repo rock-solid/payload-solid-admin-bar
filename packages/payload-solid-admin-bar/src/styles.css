@@ -61,7 +61,8 @@
   cursor: pointer;
 }
 
-.solid-admin-bar__item:hover,
+a.solid-admin-bar__item:hover,
+button.solid-admin-bar__item:hover,
 .solid-admin-bar__item[aria-expanded='true'] {
   background: var(--solid-admin-bar-hover-bg);
   color: var(--solid-admin-bar-accent);
@@ -74,6 +75,10 @@
 
 .solid-admin-bar__site {
   font-weight: 600;
+}
+
+.solid-admin-bar__tenant {
+  border-left: 1px solid var(--solid-admin-bar-hover-bg);
 }
 
 .solid-admin-bar__menu {
