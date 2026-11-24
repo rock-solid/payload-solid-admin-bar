@@ -1,0 +1,76 @@
+{
+  "name": "@rocksoliddigital/payload-solid-admin-bar",
+  "version": "0.0.0",
+  "description": "A WordPress-style admin bar for Payload CMS, the same in the admin and on the website: visit site, edit or view the current document, create new documents, exit preview and log out",
+  "keywords": [
+    "payload",
+    "payload-plugin",
+    "admin-bar",
+    "nextjs"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rock-solid/payload-solid-admin-bar.git",
+    "directory": "packages/payload-solid-admin-bar"
+  },
+  "homepage": "https://github.com/rock-solid/payload-solid-admin-bar/tree/main/packages/payload-solid-admin-bar#readme",
+  "bugs": "https://github.com/rock-solid/payload-solid-admin-bar/issues",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./plugin": {
+      "types": "./dist/plugin.d.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./admin": {
+      "types": "./dist/admin/AdminHeaderBar.d.ts",
+      "default": "./dist/admin/AdminHeaderBar.js"
+    },
+    "./site": {
+      "types": "./dist/site/AdminBar.d.ts",
+      "default": "./dist/site/AdminBar.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json && swc ./src -d ./dist --config-file .swcrc --strip-leading-paths --ignore \"**/*.test.ts,**/*.test.tsx\" && copyfiles -u 1 \"src/**/*.css\" dist/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "payload": "^3.90.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "16.3.0",
+    "@types/react": "19.2.14",
+    "@vitejs/plugin-react": "4.5.2",
+    "@vitest/browser": "4.1.11",
+    "@vitest/browser-playwright": "4.1.11",
+    "copyfiles": "^2.4.1",
+    "payload": "3.92.0",
+    "playwright": "1.58.2",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "rimraf": "^6.0.1",
+    "typescript": "5.7.3",
+    "vitest": "4.1.11"
+  }
+}

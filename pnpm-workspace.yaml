@@ -1,5 +1,7 @@
-# The package is the root; demo/ is a Payload + Next.js site that uses it from the workspace
+# The published package is in packages/; demo/ is a Payload + Next.js site that installs it from
+# the workspace
 packages:
+  - packages/*
   - demo
 
 allowBuilds:

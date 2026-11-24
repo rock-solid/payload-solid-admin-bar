@@ -51,8 +51,8 @@ either rejects a message, fix the message. **Never bypass hooks** with `--no-ver
 
 ## Changesets
 
-A PR that changes what the published package does (anything under `src/`, or `package.json`'s
-exports, dependencies or peer ranges) adds a changeset with `pnpm changeset`, or by writing
+A PR that changes what the published package does (anything in `packages/payload-solid-admin-bar/`
+except its tests and README) adds a changeset with `pnpm changeset`, or by writing
 `.changeset/<name>.md` directly: the package, the bump (`patch` for fixes, `minor` for features
 while below 1.0) and one changelog line for users. Docs, tests, CI and the `demo/` site need none.
 Never edit the version or `CHANGELOG.md` by hand; the Version Packages PR does that.
