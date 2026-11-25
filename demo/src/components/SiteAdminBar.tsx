@@ -10,6 +10,8 @@ export const SiteAdminBar = ({ preview, siteName }: { preview: boolean; siteName
   return (
     <AdminBar
       collections={{ pages: { label: 'Page' }, posts: { label: 'Post' } }}
+      // "My sites": every site the user works on
+      listTenants
       onPreviewExit={() => {
         void fetch('/next/exit-preview').then(() => router.refresh());
       }}

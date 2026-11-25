@@ -9,10 +9,13 @@ import type React from 'react';
 
 import { Bar, type BarLink } from '../Bar.js';
 import { adminLinks, labelText, siteHref, type PayloadLabel } from '../links.js';
+import { DEFAULT_TENANT_COOKIE } from '../constants.js';
 import type { AdminBarPluginOptions, AdminBarTenant } from '../plugin.js';
+import { hostName, resolveSiteURL } from './site.js';
 import {
   findTenant,
   hasTenantField,
+  listUserTenants,
   relationID,
   selectedTenantID,
   tenantField,
@@ -29,24 +32,6 @@ type Props = {
   permissions?: SanitizedPermissions;
   req?: PayloadRequest;
   user?: TypedUser | null;
-};
-
-const resolveSiteURL = async (
-  option: AdminBarPluginOptions['siteURL'],
-  payload: Payload,
-  req: PayloadRequest | undefined,
-) => {
-  if (typeof option === 'function' && req) return option({ payload, req });
-  if (typeof option === 'string') return option;
-  return payload.config.serverURL || '/';
-};
-
-const hostName = (url: string) => {
-  try {
-    return new URL(url).host;
-  } catch {
-    return 'Website';
-  }
 };
 
 /** The document on screen, read once for both its tenant and its View link. */
@@ -198,8 +183,16 @@ export const AdminHeaderBar = async ({
       site={{ label: options.siteName || hostName(siteURL), href: siteHref(siteURL, '/') ?? '/' }}
       siteInNewTab
       tenant={
-        tenants && tenant && req ? await tenantLink(tenants, tenant, payload, req, siteURL) : null
+        tenants && tenant && req
+          ? { id: tenant.id, ...(await tenantLink(tenants, tenant, payload, req, siteURL)) }
+          : null
       }
+      tenantMenu={
+        tenants
+          ? { dashboard: links.dashboard, cookie: tenants.cookie ?? DEFAULT_TENANT_COOKIE }
+          : undefined
+      }
+      tenants={tenants && req ? await listUserTenants(tenants, payload, req, siteURL) : []}
       user={{
         label: String((user as { email?: unknown }).email ?? 'Account'),
         account: links.account,

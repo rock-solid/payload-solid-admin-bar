@@ -213,7 +213,7 @@ describe('AdminHeaderBar', () => {
         expect.objectContaining({ tenant: expect.objectContaining({ id: 5 }) }),
       );
       expect(bar?.current).toEqual({ label: 'View page', href: '/harbour/menu' });
-      expect(bar?.tenant).toEqual({ label: 'Harbour', href: '/harbour' });
+      expect(bar?.tenant).toEqual({ id: 5, label: 'Harbour', href: '/harbour' });
     });
 
     it('names the tenant selected in the admin away from a document, reading the cookie id as a number', async () => {
@@ -222,7 +222,7 @@ describe('AdminHeaderBar', () => {
       expect(findByID).toHaveBeenLastCalledWith(
         expect.objectContaining({ collection: 'locations', id: 7, overrideAccess: false }),
       );
-      expect(bar?.tenant).toEqual({ label: 'Hilltop', href: '/hilltop' });
+      expect(bar?.tenant).toEqual({ id: 7, label: 'Hilltop', href: '/hilltop' });
       expect(bar?.current).toBeNull();
     });
 
@@ -258,7 +258,7 @@ describe('AdminHeaderBar', () => {
         user: user as never,
       })) as React.ReactElement<BarProps> | null;
 
-      expect(element?.props.tenant).toEqual({ label: 'Site hilltop', href: null });
+      expect(element?.props.tenant).toEqual({ id: 7, label: 'Site hilltop', href: null });
     });
 
     it('doesn’t read a document whose collection has no tenant and no View path', async () => {

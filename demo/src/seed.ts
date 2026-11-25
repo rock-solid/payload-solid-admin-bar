@@ -1,6 +1,8 @@
 import type { Payload } from 'payload';
 
 export const DEMO_USER = { email: 'demo@example.com', password: 'demo' };
+/** Works on Harbour only, so "My sites" and the admin's site picker list just Harbour. */
+export const DEMO_EDITOR = { email: 'editor@example.com', password: 'demo' };
 
 /**
  * Fills an empty database: a demo editor, two sites (tenants) with their pages, one page a draft,
@@ -10,14 +12,20 @@ export const seed = async (payload: Payload) => {
   const { totalDocs } = await payload.count({ collection: 'users' });
   if (totalDocs > 0) return;
 
-  payload.logger.info(`Seeding the demo; log in as ${DEMO_USER.email} / ${DEMO_USER.password}`);
+  payload.logger.info(
+    `Seeding the demo; log in as ${DEMO_USER.email} (every site) or ${DEMO_EDITOR.email} (Harbour), password ${DEMO_USER.password}`,
+  );
 
-  await payload.create({ collection: 'users', data: DEMO_USER });
+  await payload.create({ collection: 'users', data: { ...DEMO_USER, roles: ['admin'] } });
 
   const main = await payload.create({ collection: 'sites', data: { name: 'Main', slug: 'main' } });
   const harbour = await payload.create({
     collection: 'sites',
     data: { name: 'Harbour', slug: 'harbour' },
+  });
+  await payload.create({
+    collection: 'users',
+    data: { ...DEMO_EDITOR, roles: ['editor'], tenants: [{ tenant: harbour.id }] },
   });
   const news = await payload.create({ collection: 'categories', data: { name: 'News' } });
 

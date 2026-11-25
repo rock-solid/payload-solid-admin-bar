@@ -10,7 +10,7 @@ import { Categories } from './collections/Categories';
 import { Pages } from './collections/Pages';
 import { Posts } from './collections/Posts';
 import { Sites } from './collections/Sites';
-import { Users } from './collections/Users';
+import { isAdmin, Users } from './collections/Users';
 import type { Config, Site } from './payload-types';
 import { pagePath, postPath, siteHome } from './paths';
 import { seed } from './seed';
@@ -44,13 +44,18 @@ export default buildConfig({
         categories: { create: false },
       },
       // The site on screen, next to the site name, linking to its home page
-      tenants: { collection: 'sites', path: ({ tenant }) => siteHome(tenant.slug) },
+      // "My sites" lists the sites the user works on, as the plugin below decides
+      tenants: {
+        collection: 'sites',
+        path: ({ tenant }) => siteHome(tenant.slug),
+        userHasAccessToAllTenants: isAdmin,
+      },
     }),
     // Pages belong to a site; posts and categories are shared
     multiTenantPlugin<Config>({
       tenantsSlug: 'sites',
       collections: { pages: {} },
-      userHasAccessToAllTenants: () => true,
+      userHasAccessToAllTenants: isAdmin,
     }),
   ],
   onInit: seed,

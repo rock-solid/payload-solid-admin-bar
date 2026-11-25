@@ -185,6 +185,7 @@ export interface Category {
  */
 export interface User {
   id: number;
+  roles?: ('admin' | 'editor')[] | null;
   tenants?:
     | {
         tenant: number | Site;
@@ -348,6 +349,7 @@ export interface SitesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  roles?: T;
   tenants?:
     | T
     | {

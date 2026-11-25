@@ -4,7 +4,8 @@ import React, { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { Bar } from '../Bar.js';
 import { adminLinks, siteHref, type AdminRoutes } from '../links.js';
-import { DEFAULT_TENANT_COOKIE } from '../plugin.js';
+import { DEFAULT_TENANT_COOKIE } from '../constants.js';
+import { setTenantCookie, type BarTenant } from '../TenantMenu.js';
 
 /** The bar's markup alone, for stories and custom wrappers. */
 export { Bar, type BarProps } from '../Bar.js';
@@ -86,11 +87,11 @@ export type AdminBarProps = AdminRoutes & {
    * shares the site's origin. Defaults to `payload-tenant`; false leaves it alone.
    */
   tenantCookie?: string | false;
-};
-
-/** Sets the tenant cookie as the multi-tenant plugin does: a year, the whole site. */
-const setTenantCookie = (name: string, id: number | string) => {
-  document.cookie = `${name}=${encodeURIComponent(String(id))}; Max-Age=31536000; Path=/; SameSite=Lax`;
+  /**
+   * List every tenant the user may work on ("My sites"), from the plugin's
+   * `/api/admin-bar/tenants`, which needs the plugin's `tenants` option. Defaults to false.
+   */
+  listTenants?: boolean;
 };
 
 /** Whether the CMS is on this page's origin, so its cookies are this page's cookies. */
@@ -114,6 +115,7 @@ export const isFramed = (): boolean => {
 };
 
 type Me = { user: { email?: string } | null };
+type Tenants = { tenants?: BarTenant[] };
 type Access = { collections?: Record<string, { create?: boolean; update?: boolean }> };
 
 /**
@@ -122,6 +124,7 @@ type Access = { collections?: Record<string, { create?: boolean; update?: boolea
  */
 export const AdminBar: React.FC<AdminBarProps> = ({
   collections = {},
+  listTenants = false,
   onPreviewExit,
   preview,
   showInFrames = false,
@@ -136,7 +139,11 @@ export const AdminBar: React.FC<AdminBarProps> = ({
     () => currentDocument,
     () => null,
   );
-  const [state, setState] = useState<{ email: string; access: Access } | null>(null);
+  const [state, setState] = useState<{
+    email: string;
+    access: Access;
+    tenants: BarTenant[];
+  } | null>(null);
 
   useEffect(() => {
     // Framed (Live Preview): no bar, so no need to ask who is logged in
@@ -151,15 +158,22 @@ export const AdminBar: React.FC<AdminBarProps> = ({
     get<Me>(links.me(userCollection))
       .then(async (me) => {
         if (!me?.user) return;
-        const access = (await get<Access>(links.access)) ?? {};
-        setState({ email: me.user.email ?? 'Account', access });
+        const [access, tenants] = await Promise.all([
+          get<Access>(links.access),
+          listTenants ? get<Tenants>(links.tenants) : null,
+        ]);
+        setState({
+          email: me.user.email ?? 'Account',
+          access: access ?? {},
+          tenants: tenants?.tenants ?? [],
+        });
       })
       .catch(() => {});
 
     return () => controller.abort();
     // The links only change with the routes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [links.me(userCollection), links.access, showInFrames]);
+  }, [links.me(userCollection), links.access, links.tenants, listTenants, showInFrames]);
 
   if (!state) return null;
 
@@ -179,10 +193,11 @@ export const AdminBar: React.FC<AdminBarProps> = ({
     .map(([slug, collection]) => ({ label: collection.label, href: links.create(slug) }));
 
   const tenant = doc?.tenant ?? null;
-  const onCreate =
-    tenant && tenantCookie && sameOrigin(routes.cmsURL)
-      ? () => setTenantCookie(tenantCookie, tenant.id)
-      : undefined;
+  // The bar can set the multi-tenant plugin's cookie only on the CMS's origin
+  const cookie = tenantCookie && sameOrigin(routes.cmsURL) ? tenantCookie : null;
+  const onCreate = tenant && cookie ? () => setTenantCookie(cookie, tenant.id) : undefined;
+  // Only http(s) links, as in the admin's bar
+  const safe = (href?: string | null) => (href ? siteHref('', href) : null);
 
   return (
     <Bar
@@ -191,10 +206,9 @@ export const AdminBar: React.FC<AdminBarProps> = ({
       onCreate={onCreate}
       onPreviewExit={preview ? onPreviewExit : undefined}
       site={{ label: siteName, href: links.dashboard }}
-      tenant={
-        // Only http(s) links, as in the admin's bar
-        tenant && { label: tenant.label, href: tenant.href ? siteHref('', tenant.href) : null }
-      }
+      tenant={tenant && { id: tenant.id, label: tenant.label, href: safe(tenant.href) }}
+      tenantMenu={{ dashboard: links.dashboard, cookie }}
+      tenants={state.tenants.map((item) => ({ ...item, href: safe(item.href) }))}
       user={{ label: state.email, account: links.account, logout: links.logout }}
     />
   );
