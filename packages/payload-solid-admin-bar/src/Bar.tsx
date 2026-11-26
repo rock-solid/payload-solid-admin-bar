@@ -7,10 +7,14 @@ export type BarLink = { label: string; href: string };
 export type BarProps = {
   /** The site's name; links to the website in the admin and to the dashboard on the website. */
   site: BarLink;
+  /** The tenant on screen in a multi-tenant site, e.g. a location; links to its home page. */
+  tenant?: { label: string; href?: string | null } | null;
   /** Edit (on the website) or View (in the admin) for the document on screen. */
   current?: BarLink | null;
   /** The collections the user may create, for the "+ New" menu. */
   create?: BarLink[];
+  /** Runs when one of the "+ New" links is followed, before the browser leaves the page. */
+  onCreate?: () => void;
   /** Shown while the website is in draft (preview) mode. */
   onPreviewExit?: () => void;
   user: { label: string; account: string; logout: string };
@@ -29,9 +33,11 @@ export const Bar: React.FC<BarProps> = ({
   className,
   create = [],
   current,
+  onCreate,
   onPreviewExit,
   site,
   siteInNewTab,
+  tenant,
   user,
 }) => (
   <nav
@@ -48,6 +54,21 @@ export const Bar: React.FC<BarProps> = ({
           {site.label}
         </a>
       </li>
+      {tenant && (
+        <li>
+          {tenant.href ? (
+            <a
+              className="solid-admin-bar__item solid-admin-bar__tenant"
+              href={tenant.href}
+              {...(siteInNewTab && newTab)}
+            >
+              {tenant.label}
+            </a>
+          ) : (
+            <span className="solid-admin-bar__item solid-admin-bar__tenant">{tenant.label}</span>
+          )}
+        </li>
+      )}
       {current && (
         <li>
           <a className="solid-admin-bar__item" href={current.href} {...(siteInNewTab && newTab)}>
@@ -57,7 +78,7 @@ export const Bar: React.FC<BarProps> = ({
       )}
       {create.length > 0 && (
         <li>
-          <NewMenu items={create} />
+          <NewMenu items={create} onSelect={onCreate} />
         </li>
       )}
       {onPreviewExit && (

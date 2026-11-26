@@ -148,4 +148,150 @@ describe('AdminHeaderBar', () => {
     expect(siteURL).toHaveBeenCalledWith({ payload, req });
     expect(bar?.site).toEqual({ label: 'tenant.example.org', href: 'https://tenant.example.org/' });
   });
+
+  describe('with tenants', () => {
+    const tenantPayload = {
+      ...payload,
+      collections: {
+        pages: { config: { labels: { singular: 'Page' }, flattenedFields: [{ name: 'tenant' }] } },
+        articles: { config: { labels: { singular: 'Article' }, flattenedFields: [] } },
+        locations: { config: { admin: { useAsTitle: 'name' }, labels: { singular: 'Location' } } },
+      },
+      db: { defaultIDType: 'number' },
+    } as unknown as Payload;
+
+    const docs: Record<string, Record<string, unknown>> = {
+      'pages:10': { id: 10, slug: 'menu', tenant: 5, _status: 'published' },
+      'pages:11': { id: 11, slug: 'about', tenant: null, _status: 'published' },
+      'locations:5': { id: 5, name: 'Harbour', slug: 'harbour' },
+      'locations:7': { id: 7, name: 'Hilltop', slug: 'hilltop' },
+    };
+
+    const tenantProps = async ({
+      cookie,
+      ...extra
+    }: Partial<Parameters<typeof AdminHeaderBar>[0]> & { cookie?: string } = {}) => {
+      findByID.mockImplementation(
+        async ({ collection, id }: { collection: string; id: unknown }) => {
+          const doc = docs[`${collection}:${String(id)}`];
+          if (!doc) throw new Error('Not found');
+          return doc;
+        },
+      );
+      const path = vi.fn(
+        ({ doc, tenant }: { doc: { slug?: string }; tenant: { slug?: string } | null }) =>
+          `${tenant ? `/${tenant.slug}` : ''}/${doc.slug}`,
+      );
+      const element = (await AdminHeaderBar({
+        adminBar: {
+          siteName: 'Example',
+          collections: { pages: { path } } as never,
+          tenants: {
+            collection: 'locations' as never,
+            path: ({ tenant }) => `/${String(tenant.slug)}`,
+          },
+        },
+        payload: tenantPayload,
+        permissions: { collections: { pages: { create: true } } } as never,
+        req: { headers: new Headers(cookie ? { cookie } : {}) } as PayloadRequest,
+        user: user as never,
+        ...extra,
+      })) as React.ReactElement<BarProps> | null;
+
+      return { bar: element?.props, path };
+    };
+
+    it('names the document’s tenant and passes it to the View path', async () => {
+      // A different tenant is selected: the document's own wins
+      const { bar, path } = await tenantProps({
+        collectionSlug: 'pages',
+        docID: 10,
+        cookie: 'payload-tenant=7',
+      });
+
+      expect(path).toHaveBeenCalledWith(
+        expect.objectContaining({ tenant: expect.objectContaining({ id: 5 }) }),
+      );
+      expect(bar?.current).toEqual({ label: 'View page', href: '/harbour/menu' });
+      expect(bar?.tenant).toEqual({ label: 'Harbour', href: '/harbour' });
+    });
+
+    it('names the tenant selected in the admin away from a document, reading the cookie id as a number', async () => {
+      const { bar } = await tenantProps({ cookie: 'other=1; payload-tenant=7' });
+
+      expect(findByID).toHaveBeenLastCalledWith(
+        expect.objectContaining({ collection: 'locations', id: 7, overrideAccess: false }),
+      );
+      expect(bar?.tenant).toEqual({ label: 'Hilltop', href: '/hilltop' });
+      expect(bar?.current).toBeNull();
+    });
+
+    it('gives a document without a tenant a View path with no tenant', async () => {
+      const { bar, path } = await tenantProps({
+        collectionSlug: 'pages',
+        docID: 11,
+        cookie: 'payload-tenant=7',
+      });
+
+      expect(path).toHaveBeenCalledWith(expect.objectContaining({ tenant: null }));
+      expect(bar?.current?.href).toBe('/about');
+      // The admin's selection is still shown
+      expect(bar?.tenant?.label).toBe('Hilltop');
+    });
+
+    it('shows no tenant when none is selected, or the user can’t read it', async () => {
+      expect((await tenantProps()).bar?.tenant).toBeNull();
+      expect((await tenantProps({ cookie: 'payload-tenant=99' })).bar?.tenant).toBeNull();
+    });
+
+    it('shows the tenant without a link when it has no home page', async () => {
+      findByID.mockImplementation(async () => docs['locations:7']);
+      const element = (await AdminHeaderBar({
+        adminBar: {
+          tenants: {
+            collection: 'locations' as never,
+            label: (tenant) => `Site ${String(tenant.slug)}`,
+          },
+        },
+        payload: tenantPayload,
+        req: { headers: new Headers({ cookie: 'payload-tenant=7' }) } as PayloadRequest,
+        user: user as never,
+      })) as React.ReactElement<BarProps> | null;
+
+      expect(element?.props.tenant).toEqual({ label: 'Site hilltop', href: null });
+    });
+
+    it('doesn’t read a document whose collection has no tenant and no View path', async () => {
+      const { bar } = await tenantProps({
+        collectionSlug: 'articles',
+        docID: 1,
+        cookie: 'payload-tenant=7',
+      });
+
+      expect(findByID).not.toHaveBeenCalledWith(
+        expect.objectContaining({ collection: 'articles' }),
+      );
+      expect(bar?.tenant?.label).toBe('Hilltop');
+    });
+
+    it('reads the cookie with the tenants collection’s own id type', async () => {
+      findByID.mockClear();
+      const textIDs = {
+        ...tenantPayload,
+        collections: {
+          ...tenantPayload.collections,
+          locations: {
+            ...(tenantPayload.collections as Record<string, object>).locations,
+            customIDType: 'text',
+          },
+        },
+      } as unknown as Payload;
+
+      await tenantProps({ cookie: 'payload-tenant=7', payload: textIDs });
+
+      expect(findByID).toHaveBeenCalledWith(
+        expect.objectContaining({ collection: 'locations', id: '7' }),
+      );
+    });
+  });
 });
