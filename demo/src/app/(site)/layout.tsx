@@ -8,6 +8,8 @@ import { listPublished, listSites, mainSite } from '@/data';
 import { MAIN_SITE, siteHome } from '@/paths';
 import { SITE_NAME } from '@/site';
 
+import '@rocksoliddigital/payload-solid-admin-bar/styles.css';
+
 import './site.css';
 
 export const metadata: Metadata = { title: SITE_NAME };
