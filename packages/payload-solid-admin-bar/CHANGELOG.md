@@ -1,5 +1,15 @@
 # @rocksoliddigital/payload-solid-admin-bar
 
+## 0.3.0
+
+### 🚀 Features
+
+- The components no longer import their stylesheet, so they load in plain Node (e.g. integration tests). **Breaking:** import `@rocksoliddigital/payload-solid-admin-bar/styles.css` once in the website's root layout and in `app/(payload)/layout.tsx` ([#6](https://github.com/rock-solid/payload-solid-admin-bar/pull/6)) ([c6051df](https://github.com/rock-solid/payload-solid-admin-bar/commit/c6051df60335a03125977a312f955bb1410fc495))
+
+### 🤝 Contributors
+
+- Adrian Cando (@godhand1607)
+
 ## 0.2.0
 
 ### 🚀 Features
