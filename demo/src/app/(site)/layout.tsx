@@ -7,6 +7,8 @@ import { SiteAdminBar } from '@/components/SiteAdminBar';
 import { listPublished } from '@/data';
 import { SITE_NAME } from '@/site';
 
+import '@rocksoliddigital/payload-solid-admin-bar/styles.css';
+
 import './site.css';
 
 export const metadata: Metadata = { title: SITE_NAME };

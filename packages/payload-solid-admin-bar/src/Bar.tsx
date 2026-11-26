@@ -2,8 +2,6 @@ import type React from 'react';
 
 import { NewMenu } from './NewMenu.js';
 
-import './styles.css';
-
 export type BarLink = { label: string; href: string };
 
 export type BarProps = {

@@ -48,7 +48,8 @@ plugins: [
 ];
 ```
 
-Then run `payload generate:importmap`. The bar goes in `admin.components.header`, so it sits above
+Then run `payload generate:importmap`, and import the [stylesheet](#styling) in
+`app/(payload)/layout.tsx`. The bar goes in `admin.components.header`, so it sits above
 Payload's own header and scrolls away with it (Payload has many `position: sticky` elements that a
 fixed bar would cover).
 
@@ -77,6 +78,11 @@ import { AdminBar } from '@rocksoliddigital/payload-solid-admin-bar/site';
 ```
 
 ```tsx
+// the site's root layout, once
+import '@rocksoliddigital/payload-solid-admin-bar/styles.css';
+```
+
+```tsx
 // in each page: which document it shows, for the Edit link
 import { AdminBarDocument } from '@rocksoliddigital/payload-solid-admin-bar/site';
 
@@ -94,7 +100,15 @@ anyway.
 
 ## Styling
 
-`styles.css` is imported by the components. Override the custom properties on `.solid-admin-bar`
+Import the stylesheet once in each root layout that shows the bar: the website's and Payload's
+`app/(payload)/layout.tsx`.
+
+```ts
+import '@rocksoliddigital/payload-solid-admin-bar/styles.css';
+```
+
+The components don't import it themselves, so they also load in plain Node (integration tests,
+scripts). Override the custom properties on `.solid-admin-bar`
 (`--solid-admin-bar-bg`, `-fg`, `-hover-bg`, `-accent`, `-height`). `Bar` (from `/site`) is the
 markup alone, for stories and custom wrappers.
 
